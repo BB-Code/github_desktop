@@ -1,11 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:window_manager/window_manager.dart';
 
-final String leftBottom = 'assets/svg/welcome-illustration-left-bottom.svg';
-final String leftTop = 'assets/svg/welcome-illustration-left-top.svg';
-final String right = 'assets/svg/welcome-illustration-right.svg';
+const String leftBottom = 'assets/svg/welcome-illustration-left-bottom.svg';
+const String leftTop = 'assets/svg/welcome-illustration-left-top.svg';
+const String right = 'assets/svg/welcome-illustration-right.svg';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+
+  WindowOptions windowOptions = const WindowOptions(
+    size: Size(960, 660),
+    center: true,
+    skipTaskbar: true,
+    windowButtonVisibility:true,
+    titleBarStyle: TitleBarStyle.hidden
+  );
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
   runApp(const MyApp());
 }
 
@@ -16,7 +31,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Github Desktop',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           // This is the theme of your application.
@@ -37,17 +51,20 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: Row(children: <Widget>[
-          Column(children: [
-            Container(
-              width: MediaQuery.of(context).size.width / 2,
-              color: Colors.white,
-              height: MediaQuery.of(context).size.height,
-            )
-          ]),
+        home: DragToMoveArea(child: Row(children: <Widget>[
+        //  SizedBox(
+        //   height: 50,
+        //   width: 10,
+        //   child: Row(
+        //     children: [
+        //               WindowCaptionButton.minimize(),
+        // WindowCaptionButton.maximize(),
+        // WindowCaptionButton.close(),
+        //     ],
+        //   )) ,
           Column(children: <Widget>[
             Container(
-                width: MediaQuery.of(context).size.width / 2,
+                width: 580,
                 decoration: const BoxDecoration(
                     color: Colors.white,
                     border: Border(
@@ -57,13 +74,21 @@ class MyApp extends StatelessWidget {
                 height: MediaQuery.of(context).size.height / 2,
                 child: SvgPicture.asset(leftTop, width: 140, height: 140)),
             Container(
-                width: MediaQuery.of(context).size.width / 2,
+                width: 580,
                 color: Colors.white,
                 alignment: Alignment.bottomRight,
                 height: MediaQuery.of(context).size.height / 2,
                 child: SvgPicture.asset(leftBottom, height: 280))
-          ])
-        ]));
+          ]),
+          Column(children: <Widget>[
+            Container(
+              color: const Color(0xff28373b),
+              width: MediaQuery.of(context).size.width - 580,
+              height: MediaQuery.of(context).size.height,
+              child: SvgPicture.asset(right, height: 280),
+            )
+          ]),
+        ])));
   }
 }
 
